@@ -119,6 +119,20 @@
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
+
+    var result = [];
+
+    // Iterate with each
+    _.each(array, function(item) {
+      // Use indexOf to check if already pushed to result
+      // If not in result yet, then push to result
+      if (_.indexOf(result, item) === -1) {
+        result.push(item);
+      }
+    })
+
+    return result;
+
   };
 
 
