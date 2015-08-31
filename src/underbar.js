@@ -108,6 +108,13 @@
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
+
+    return _.filter(collection, function(item) {
+      // If the item fails the test, then you should return it to the filter function
+      // so that the filter function can create an array of the failed items
+      return !test(item)
+    });
+
   };
 
   // Produce a duplicate-free version of the array.
