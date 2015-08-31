@@ -191,6 +191,28 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+
+    var current;
+
+    // Set the current variable based on whether or not the 'accumlator'
+    // parameter is provided
+    if (accumulator !== undefined) {
+      current = accumulator;
+    // When not provided, sse the first element in the collection as the accumulator,
+    // and then remove it from the collection
+    } else {
+      current = collection[0];
+      collection.shift();
+    }
+
+    // Use each to go thru each item, and "combine" with the iterator function
+    _.each(collection, function(item) {
+      current = iterator(current, item);
+    })
+
+    // Return the end result in current
+    return current;
+
   };
 
   // Determine if the array or object contains a given value (using `===`).
