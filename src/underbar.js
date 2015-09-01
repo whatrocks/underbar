@@ -98,7 +98,7 @@
       if (test(thing)) {
         result.push(thing);
       }
-    })
+    });
 
     return result;
 
@@ -112,7 +112,7 @@
     return _.filter(collection, function(item) {
       // If the item fails the test, then you should return it to the filter function
       // so that the filter function can create an array of the failed items
-      return !test(item)
+      return !test(item);
     });
 
   };
@@ -129,7 +129,7 @@
       if (_.indexOf(result, item) === -1) {
         result.push(item);
       }
-    })
+    });
 
     return result;
 
@@ -146,7 +146,7 @@
 
     _.each(collection, function(item) {
       result.push(iterator(item));
-    })
+    });
 
     return result;
 
@@ -208,7 +208,7 @@
     // Use each to go thru each item, and "combine" with the iterator function
     _.each(collection, function(item) {
       current = iterator(current, item);
-    })
+    });
 
     // Return the end result in current
     return current;
