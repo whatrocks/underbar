@@ -348,6 +348,20 @@
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+
+    for (var i = 0; i < arguments.length; i++) {
+      for (var thing in arguments[i]) {
+        // Same as extend, but need to first check if the key
+        // is already in obj, and if it is, skip to next iteration
+        if (thing in obj) {
+          continue;
+        }
+        obj[thing] = arguments[i][thing];
+      }
+    }
+
+    return obj;
+
   };
 
 
