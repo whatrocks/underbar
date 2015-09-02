@@ -231,6 +231,42 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+
+    // Use the underbar.js _.identity function when there is 
+    // no iterator passed to _.every
+    if (!iterator) {
+      iterator = _.identity;
+    }
+
+    // Create a variable "result" to store the result
+    // of reducing the collection by checking for 
+    // the truthiness of the items
+    var result = _.reduce(collection, function(a, b) {
+      
+      // Not sure if this is an ideal way to do this
+      // but this solves an issue with concatenation.
+      // Specifically, empty arrays or object literals were not
+      // evaluating to "1", so the reduction wasn't working.
+      if (typeof b === "object") {
+        b = 1;
+      }
+      return a + iterator(b);
+    
+    // Start with a value of 1 so that empty collections
+    // will evaluate to true
+    }, 1);
+
+    // If all the items in the collection match the truth test,
+    // then the result variable should be greater than the 
+    // number of items in the collection
+    if (result > collection.length) {
+      return true;
+    } else {
+      return false;
+    }
+
+
+
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
