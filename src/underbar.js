@@ -436,6 +436,28 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+
+    var numbOfPassedParameters = arguments.length - 2;
+    var passedParams = [];
+
+    // Create an array of parameters to pass to "func"
+    for (var i = 0; i < numbOfPassedParameters; i++) {
+      var param = arguments[arguments.length - 1 - i];
+      passedParams.unshift(param);
+    }
+
+    /* This returns a function, rather than execute the function
+    return function() {
+      setTimeout(function() {
+        return func.apply(this, passedParams);
+      }, wait);
+    };*/
+
+    // This will execute the function
+    return setTimeout(function() {
+      return func.apply(this, passedParams);
+    }, wait);
+
   };
 
 
