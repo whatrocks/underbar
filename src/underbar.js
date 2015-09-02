@@ -323,6 +323,26 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+
+    // Iterate through the arguments object
+    // starting with the second element
+    for (var i = 1; i < arguments.length; i++) {
+
+      // Iterate through any and all properties
+      // in each of the arguments
+      for (var thing in arguments[i]) {
+
+        // Add or replace that property in the
+        // original object
+        obj[thing] = arguments[i][thing];
+
+      }
+
+    }
+
+    // Return the object
+    return obj;
+
   };
 
   // Like extend, but doesn't ever overwrite a key that already
