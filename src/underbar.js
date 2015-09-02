@@ -405,6 +405,28 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+
+    var result;
+    // Object to store the computed results
+    var alreadyComputed = {};
+
+    return function() {
+
+      // Creates simple array from the arguments object
+      var args = Array.prototype.slice.call(arguments, 0);
+
+      if (!(args in alreadyComputed)) {
+        result = func.apply(this, args);
+        // Add the computed result to "alreadyComputed" object
+        alreadyComputed[args] = result;
+      } else {
+        result = alreadyComputed[args];
+      }
+
+      return result;
+    };
+
+
   };
 
   // Delays a function for the given number of milliseconds, and then calls
