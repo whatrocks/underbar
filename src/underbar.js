@@ -243,6 +243,12 @@
     // the truthiness of the items
     var result = _.reduce(collection, function(a, b) {
       
+      // Checking here for null values, since null
+      // evaluates to "object" below
+      if (b === null) {
+        b = 0;
+      }
+
       // Not sure if this is an ideal way to do this
       // but this solves an issue with concatenation.
       // Specifically, empty arrays or object literals were not
@@ -250,6 +256,14 @@
       if (typeof b === "object") {
         b = 1;
       }
+
+      // Another concatenation quick-fix for "truthy" strings
+      if (typeof b === "string") {
+        if (b.length > 0) {
+          b = 1;
+        }
+      }
+
       return a + iterator(b);
     
     // Start with a value of 1 so that empty collections
@@ -264,15 +278,29 @@
     } else {
       return false;
     }
-
-
-
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+
+    var result = 0;
+
+    _.each(collection, function(item) {
+
+      var tempArr = [];
+      tempArr.push(item);
+      result += _.every(tempArr, iterator);
+
+    });
+
+    if (result > 0) {
+      return true;
+    } else {
+      return false;
+    }
+
   };
 
 
