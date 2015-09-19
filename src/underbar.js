@@ -523,6 +523,17 @@
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
+
+    return _.reduce(nestedArray, function(a, b) {
+
+      if (b instanceof Array) {
+        return a.concat(_.flatten(b));
+      } else {
+        return a.concat(b);
+      }
+
+    }, []);
+
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
