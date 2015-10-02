@@ -38,13 +38,9 @@
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
   _.last = function(array, n) {
-    if (n === undefined) {
-      return array.pop();
-    } else if (n === 0) {
-      return [];
-    } else {
-      return array.slice(-n);
-    }
+
+    return n === undefined ? array[array.length - 1] : array.slice(Math.max(0, array.length - n));
+
   };
 
   // Call iterator(value, key, collection) for each element of collection.
@@ -109,10 +105,10 @@
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
 
-    return _.filter(collection, function(item) {
+    return _.filter(collection, function(value) {
       // If the item fails the test, then you should return it to the filter function
       // so that the filter function can create an array of the failed items
-      return !test(item);
+      return !test(value);
     });
 
   };
@@ -120,6 +116,8 @@
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
 
+    
+    /* Charlie original solution
     var result = [];
 
     // Iterate with each
@@ -132,6 +130,23 @@
     });
 
     return result;
+    */
+
+    // HR preferred solution: Breadcrumbing
+
+    var result = [];
+    var unique = {};
+
+    for (var i = 0; i < array.length; i++) {
+      unique[array[i]] = array[i];
+    }
+
+    for (var key in unique) {
+      result.push(unique[key]);
+    }
+
+    return result;
+
 
   };
 
@@ -144,8 +159,8 @@
 
     var result = [];
 
-    _.each(collection, function(item) {
-      result.push(iterator(item));
+    _.each(collection, function(value, key, collection) {
+      result.push(iterator(value, key, collection));
     });
 
     return result;
@@ -192,6 +207,8 @@
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
 
+
+    /* Charlie original solution
     var current;
 
     // Set the current variable based on whether or not the 'accumlator'
@@ -211,7 +228,25 @@
     });
 
     // Return the end result in current
-    return current;
+    return current; */
+
+
+    // HR Solution
+
+    var initializing = arguments.length === 2;
+
+    _.each(collection, function(value) {
+
+      if (initializing) {
+        accumulator = value;
+        initializing = false;
+      } else {
+        accumulator = iterator(accumulator, value);
+      }
+
+    });
+
+    return accumulator;
 
   };
 
@@ -232,6 +267,9 @@
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
 
+
+
+    /* Charlie original solution
     // Use the underbar.js _.identity function when there is 
     // no iterator passed to _.every
     if (!iterator) {
@@ -278,6 +316,15 @@
     } else {
       return false;
     }
+    */
+
+    // HR Solution
+    iterator = iterator || _.identity;
+
+    return !!_.reduce(collection, function(trueSoFar, value) {
+      return trueSoFar && iterator(value);
+    }, true);
+
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
@@ -285,6 +332,7 @@
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
 
+    /* charlie old solution
     var result = 0;
 
     _.each(collection, function(item) {
@@ -299,7 +347,14 @@
       return true;
     } else {
       return false;
-    }
+    } */
+
+    // HR Solution
+    iterator = iterator || _.identity;
+
+    return !!_.reduce(collection, function(trueSoFar, value) {
+      return trueSoFar || iterator(value);
+    }, false);
 
   };
 
@@ -324,6 +379,8 @@
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
 
+
+    /* Charlie's Solution
     // Iterate through the arguments object
     // starting with the second element
     for (var i = 1; i < arguments.length; i++) {
@@ -342,6 +399,15 @@
 
     // Return the object
     return obj;
+    */
+
+    // HR Solution
+    _.each(arguments, function(source) {
+      _.each(source, function(value, key) {
+        obj[key] = value;
+      });
+    });
+    return obj;
 
   };
 
@@ -349,6 +415,8 @@
   // exists in obj
   _.defaults = function(obj) {
 
+    // Charlie solution
+    /*
     for (var i = 0; i < arguments.length; i++) {
       for (var thing in arguments[i]) {
         // Same as extend, but need to first check if the key
@@ -361,7 +429,15 @@
     }
 
     return obj;
+    */
 
+    //HR solution
+    _.each(arguments, function(source) {
+      _.each(source, function(value, key) {
+        obj[key] === undefined && (obj[key] = value);
+      });
+    });
+    return obj;
   };
 
 
@@ -406,6 +482,23 @@
   // instead if possible.
   _.memoize = function(func) {
 
+
+    // HR solution
+    var results = {};
+
+    return function() {
+
+      var arg = JSON.stringify(arguments);
+
+      if ( !results[arg] ) {
+        results[arg] = func.apply(this, arguments);
+      }
+
+      return results[arg]; 
+
+    };
+
+    /* Charlie solution
     var result;
     // Object to store the computed results
     var alreadyComputed = {};
@@ -424,7 +517,7 @@
       }
 
       return result;
-    };
+    }; */
 
 
   };
@@ -445,13 +538,6 @@
       var param = arguments[arguments.length - 1 - i];
       passedParams.unshift(param);
     }
-
-    /* This returns a function, rather than execute the function
-    return function() {
-      setTimeout(function() {
-        return func.apply(this, passedParams);
-      }, wait);
-    };*/
 
     // This will execute the function
     return setTimeout(function() {
@@ -474,19 +560,17 @@
   _.shuffle = function(array) {
 
     var copyArray = array.slice();
-    var totalItems = copyArray.length;
-    var randomizedArray = [];
+    var arrayLength = copyArray.length;
+    var results = [];
 
-    for (var i = 0; i < totalItems; i++) {
-
+    for (var i = 0; i < arrayLength; i++) {
       var randomIndex = Math.floor(Math.random() * copyArray.length);
       var randomItem = copyArray[randomIndex];
-      randomizedArray.push(randomItem);
+      results.push(randomItem);
       copyArray.splice(randomIndex, 1);
-    
     }
 
-    return randomizedArray;
+    return results;
   };
 
 
@@ -501,6 +585,12 @@
   // Calls the method named by functionOrKey on each value in the list.
   // Note: You will need to learn a bit about .apply to complete this.
   _.invoke = function(collection, functionOrKey, args) {
+
+    return _.map(collection, function(item) {
+      var method = typeof functionOrKey === "string" ? item[functionOrKey] : functionOrKey;
+      return method.apply(item, args);
+    });
+
   };
 
   // Sort the object's values by a criterion produced by an iterator.
@@ -516,6 +606,19 @@
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+
+    var result = [];
+
+    var arraze = Array.prototype.slice.call(arguments, 0);
+
+    var zipper = function() {
+
+    };
+
+    zipper(arraze);
+
+    return result;
+
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
